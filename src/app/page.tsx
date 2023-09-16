@@ -4,6 +4,7 @@ import React, { useState } from "react"; // Added { useState }
 import Router from "next/router";
 import firebase from "firebase/app";
 import "firebase/auth";
+import { collection, addDoc } from "firebase/firestore";
 
 export default function Home() {
   const [items, setItems] = useState([
@@ -12,6 +13,14 @@ export default function Home() {
     { name: 'candy', price: 3.95 },
   ]);
   const [total, setTotal] = useState(0);
+
+  //Add items to database
+  const addItem = async (e) => {
+    e.preventDefault()
+  }
+  //Read items from the database
+
+  //Delete items from database
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between sm:p-24">
