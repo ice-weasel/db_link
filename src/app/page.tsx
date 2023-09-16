@@ -23,6 +23,23 @@ export default function Home() {
             <input className="col-span-2 p-3 border mx-3" type="number" placeholder="Enter $" />
             <button className="text-white bg-slate-950 hover:bg-slate-900 p-3 text-xl" type="submit">+</button>
           </form>
+          <ul>
+            {items.map((item, id) => ( // Changed 'key="id"' to 'key={id}'
+              <li key={id} className="my-4 w-full flex justify-between bg-slate-950">
+                <div className="p-4 w-full flex justify-between">
+                  <span className="capitalize">{item.name}</span>
+                  <span>{item.price}</span>
+                </div>
+                <button className="ml-8 p-4 border-l-2 border-slate-900 hover:bg-slate-900 w-16">X</button>
+              </li>
+            ))}
+          </ul>
+          {items.length < 1 ? '' : ( // Removed the extra parentheses
+            <div className="flex justify-between p-3">
+              <span>Total</span>
+              <span>${total}</span>
+            </div>
+          )}
         </div>
       </div>
     </main>
