@@ -4,16 +4,29 @@ import React, { useState } from "react";
 import Router from "next/router";
 
 import "firebase/auth";
-import { collection, addDoc,   } from "firebase/firestore";
+import { collection, addDoc, getFirestore, } from "firebase/firestore";
 import "firebase/auth";
 import "@firebase/firestore";
 
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import 'firebase/compat/firestore';
-import { getFirestore, Firestore } from "firebase/firestore";
+
+import { Firestore } from "firebase/firestore";
+
+const db = getFirestore();
 
 export default function Home() {
+
+  const firebaseConfig = {
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  };
+  
+
   const [items, setItems] = useState([
     { name: 'Coffee', price: 4.95 },
     { name: 'Movie', price: 7.95 },
@@ -21,20 +34,19 @@ export default function Home() {
   ]);
   const [newItem, setNewItem] = useState({name: '',price: ''});
   const [total, setTotal] = useState(0);
-
+ 
  // Initialize Firestore and assign it to db
-
- const db: Firestore = firebase.firestore();
+const db: Firestore = getFirestore();
+ 
   const addItem = async (e:React.FormEvent) => {
     e.preventDefault()
   
-  if(newItem.name!= '' && newItem.price! == '')
-  {
+    if(newItem.name!= '' && newItem.price! == '') {
       await addDoc(collection(db,"items"), {
-      name: newItem.name.trim(),
-      price: newItem.price,
-    })
-  }
+        name: newItem.name.trim(),
+        price: newItem.price,
+      })
+    }
 };
   return (
     <main className="flex min-h-screen flex-col items-center justify-between sm:p-24">
