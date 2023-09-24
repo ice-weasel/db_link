@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, Firestore } from "firebase/firestore";
+import { getFirestore, collection,getDocs,updateDoc,doc,Firestore } from "firebase/firestore";
 import firebase from "firebase/compat/app";
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -9,5 +10,6 @@ const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
-firebase.initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export default app;
+export const db = getFirestore(app);
