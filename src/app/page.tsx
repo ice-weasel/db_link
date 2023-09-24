@@ -23,6 +23,7 @@ import "@firebase/firestore";
 
 import "firebase/compat/auth";
 import { db } from './firebase';
+import { deleteDoc } from "@firebase/firestore/lite";
 
 
 export default function Home() {
@@ -48,9 +49,10 @@ export default function Home() {
 useEffect(() => {
   const q = query(collection(db, "items"));
   const unsubscribe = onSnapshot(q, (snapshot) => {
-    const itemsArr: Array<{ name: string; price: number }> = snapshot.docs.map((doc) => ({
-      name: doc.get("itemName"), // Replace "itemName" with the actual property name in your Firestore document
-      price: doc.get("itemPrice"), // Replace "itemPrice" with the actual property name in your Firestore document
+    const itemsArr: Array<{ id: string; name: string; price: number }> = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      name: doc.get("name"), 
+      price: doc.get("price"), 
     }));
     setItems(itemsArr);
   });
@@ -59,6 +61,21 @@ useEffect(() => {
     unsubscribe();
   };
 }, []);
+
+// Calculate total directly from the updated itemsArr
+const calculateTotal = () => {
+  const totalPrice = items.reduce(
+    (sum, item) => sum + item.price,
+    0
+  );
+  setTotal(totalPrice);
+};
+
+// Delete items from databaseca
+const deleteItem = async (id: string) => {
+  await deleteDoc(doc(db, 'items', id));
+};
+
 
 
   return (
@@ -69,14 +86,16 @@ useEffect(() => {
           <form className="grid grid-cols-6 items-center text-black">
             <input
               value={newItem.name}
-              onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+              onChange={(e) => 
+                setNewItem({ ...newItem, name: e.target.value })}
               className="col-span-3 p-3 border"
               type="text"
               placeholder="Enter Item"
             />
             <input
               value={newItem.price}
-              onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+              onChange={(e) => 
+                setNewItem({ ...newItem, price: e.target.value })}
               className="col-span-2 p-3 border mx-3"
               type="number"
               placeholder="Enter $"
@@ -91,12 +110,15 @@ useEffect(() => {
           </form>
           <ul>
             {items.map((item, id) => (
-              <li key={id} className="my-4 w-full flex justify-between bg-slate-950">
+              <li key={id} 
+              className="my-4 w-full flex justify-between bg-slate-950">
                 <div className="p-4 w-full flex justify-between">
                   <span className="capitalize">{item.name}</span>
                   <span>{item.price}</span>
                 </div>
-                <button className="ml-8 p-4 border-l-2 border-slate-900 hover:bg-slate-900 w-16">
+                <button
+                onClick={() => deleteItem(item.id)}
+                className="ml-8 p-4 border-l-2 border-slate-900 hover:bg-slate-900 w-16">
                   X
                 </button>
               </li>
