@@ -1,53 +1,65 @@
 'use client'
 
 
-import React, { useState } from "react";
-import Router from "next/router";
+import React, { useEffect,
+   useState 
+  } from "react";
+
 
 import "firebase/auth";
-import { collection, addDoc, getFirestore } from "firebase/firestore";
+
+import { 
+  collection, 
+  addDoc,
+  getDoc,
+  QuerySnapshot, 
+  getFirestore, 
+  query, 
+  onSnapshot, 
+  doc 
+} from "firebase/firestore";
 import "firebase/auth";
 import "@firebase/firestore";
 
-import firebase from "firebase/compat/app";
 import "firebase/compat/auth";
+import { db } from './firebase';
 
-import { Firestore } from "firebase/firestore";
 
 export default function Home() {
-  const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-  };
-
   // Initialize the Firebase App
-  firebase.initializeApp(firebaseConfig);
+  const [items, setItems] = useState<Array<{ name: string; price: number; }>>([]);
 
-  const [items, setItems] = useState([
-    { name: "Coffee", price: 4.95 },
-    { name: "Movie", price: 7.95 },
-    { name: "Candy", price: 3.95 },
-  ]);
-  const [newItem, setNewItem] = useState({ name: "", price: "" });
+  const [newItem, setNewItem] = useState({ name: '', price: '' });
   const [total, setTotal] = useState(0);
 
-  // Initialize Firestore and assign it to db
-  const db: Firestore = getFirestore();
 
+//Add item to database
   const addItem = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (newItem.name !== "" && newItem.price !== "") {
-      await addDoc(collection(db, "items"), {
+    if (newItem.name !== '' && newItem.price !== '') {
+      await addDoc(collection(db, 'items'), {
         name: newItem.name.trim(),
         price: newItem.price,
       });
     }
   };
+// Read items from database
+useEffect(() => {
+  const q = query(collection(db, "items"));
+  const unsubscribe = onSnapshot(q, (snapshot) => {
+    const itemsArr: Array<{ name: string; price: number }> = snapshot.docs.map((doc) => ({
+      name: doc.get("itemName"), // Replace "itemName" with the actual property name in your Firestore document
+      price: doc.get("itemPrice"), // Replace "itemPrice" with the actual property name in your Firestore document
+    }));
+    setItems(itemsArr);
+  });
+
+  return () => {
+    unsubscribe();
+  };
+}, []);
+
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-between sm:p-24">
